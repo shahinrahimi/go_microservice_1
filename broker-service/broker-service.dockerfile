@@ -1,21 +1,22 @@
-FROM golang:1.23-alpine as builder
+# FROM golang:1.23-alpine as builder
 
-RUN mkdir /app
+# RUN mkdir /app
 
-COPY . /app
+# COPY . /app
 
-WORKDIR /app
+# WORKDIR /app
 
-# not using c library just standard GO library
-RUN CGO_ENABLED=0 go build -o brokerApp ./cmd/
+# # not using c library just standard GO library
+# RUN CGO_ENABLED=0 go build -o brokerApp ./cmd/
 
-RUN chmod +x /app/brokerApp
+# RUN chmod +x /app/brokerApp
 
 # Build a small image
 FROM alpine:latest
 
 RUN mkdir /app
 
-COPY --from=builder /app/brokerApp /app 
+# COPY --from=builder /app/brokerApp /app 
+COPY brokerApp /app
 
 CMD ["/app/brokerApp"]
