@@ -6,7 +6,7 @@ services:
     restart: always
     ports:
     # can hit broker-service on port 8080 from frontend at port 80
-      - "8080:80"
+      - "8090:80"
     deploy:
       mode: replicated
       replicas: 1
