@@ -1,17 +1,17 @@
-FROM golang:1.23-alpine AS builder
+FROM docker.arvancloud.ir/golang:1.24-alpine AS builder
 
 WORKDIR /app
 
 COPY . .
 
-RUN go build -o /bin/frontApp ./cmd
+RUN CGO_ENABLED=0 go build -o /bin/frontApp ./cmd/web
 
-FROM alpine:latest
+FROM docker.arvancloud.ir/alpine:latest
 
-WORKDIR /root/
+WORKDIR /root
 
-COPY --from=builder /bin/frontApp .
+COPY --from=builder /bin/frontApp . 
 
 COPY --from=builder /app/cmd/web/templates ./cmd/web/templates
 
-CMD ["./frontApp"]
+CMD ["/root/frontApp"]

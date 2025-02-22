@@ -41,7 +41,7 @@
         const body = {
             method: 'POST',
         }
-        fetch("http://localhost:8081", body)
+        fetch("http://localhost:3001", body)
         .then(response => response.json())
         .then(data => {
             sent.innerHTML = "empty post request";

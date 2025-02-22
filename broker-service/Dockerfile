@@ -1,15 +1,17 @@
-FROM golang:1.23-alpine AS builder
+# base go image
+FROM docker.arvancloud.ir/golang:1.24-alpine AS builder
 
 WORKDIR /app
 
 COPY . .
 
-RUN go build -o /bin/brokerApp ./cmd
+RUN CGO_ENABLED=0 go build -o /bin/brokerApp ./cmd/api
 
-FROM alpine:latest
+# build a tiny docker image
+FROM docker.arvancloud.ir/alpine:latest
 
-WORKDIR /root/
+WORKDIR /root
 
 COPY --from=builder /bin/brokerApp .
 
-CMD ["./brokerApp"]
+CMD ["/root/brokerApp"]
