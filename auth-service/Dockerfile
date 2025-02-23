@@ -1,15 +1,15 @@
-FROM golang:1.23-alpine AS builder
+FROM docker.arvancloud.ir/golang:1.24-alpine AS builder
 
 WORKDIR /app
 
 COPY . .
 
-RUN go build -o /bin/authApp ./cmd
+RUN GOOS=linux CGO_ENABLED=0 go build -o /bin/authApp ./cmd/api
 
 FROM alpine:latest
 
-WORKDIR /root/
+WORKDIR /root
 
 COPY --from=builder /bin/authApp .
 
-CMD ["./authApp"]
+CMD ["/root/authApp"]

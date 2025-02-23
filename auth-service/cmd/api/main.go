@@ -1,7 +1,7 @@
 package main
 
 import (
-	"auth/cmd/data"
+	"auth/data"
 	"database/sql"
 	"fmt"
 	"log"
@@ -14,7 +14,7 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
-const webPort = "80"
+const webPort = "3000"
 
 var counts int64
 

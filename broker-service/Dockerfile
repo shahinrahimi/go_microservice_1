@@ -5,7 +5,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN CGO_ENABLED=0 go build -o /bin/brokerApp ./cmd/api
+RUN GOOS=linux CGO_ENABLED=0 go build -o /bin/brokerApp ./cmd/api
 
 # build a tiny docker image
 FROM docker.arvancloud.ir/alpine:latest

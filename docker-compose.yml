@@ -3,6 +3,7 @@ services:
     image: front-app
     build: ./front-end
     restart: always
+    # port host:docker
     ports:
      - "3000:3000"
     deploy:
@@ -14,9 +15,34 @@ services:
     build: ./broker-service 
     restart: always
     ports:
-    # can hit broker-service on port 8080 from frontend at port 80
-      - "3001:3001"
+      - "3001:3000"
     deploy:
       mode: replicated
       replicas: 1
+  
+  auth-service:
+    image: auth-api
+    build: ./auth-service 
+    restart: always
+    ports:
+      - "3002:3000"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      DSN: "host=postgres port=5432 user=postgres password=postgres dbname=users sslmode=disable timezone=UTC connect_timeout=5" 
+  postgres:
+    image: postgres:14.0
+    ports: 
+      - "5432:5432"
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: users
+    volumes:
+      - ./db-data/postgres/:/var/lib/postgresql/data/
   

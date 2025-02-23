@@ -36,12 +36,11 @@
     let output = document.getElementById("output")
     let sent = document.getElementById("payload")
     let received = document.getElementById("received")
-
     brokerBtn.addEventListener("click", function() {
         const body = {
             method: 'POST',
         }
-        fetch("http://localhost:3001", body)
+        fetch("http://broker-service:3000", body)
         .then(response => response.json())
         .then(data => {
             sent.innerHTML = "empty post request";
