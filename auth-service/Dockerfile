@@ -6,7 +6,7 @@ COPY . .
 
 RUN GOOS=linux CGO_ENABLED=0 go build -o /bin/authApp ./cmd/api
 
-FROM alpine:latest
+FROM docker.arvancloud.ir/alpine:latest
 
 WORKDIR /root
 
