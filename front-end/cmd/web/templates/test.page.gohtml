@@ -31,7 +31,7 @@
         </div>
     </div>
 {{end}}
-jj
+
 {{define "js"}}
     <script>
     let brokerBtn = document.getElementById("brokerBtn")
@@ -42,7 +42,7 @@ jj
     
     let sent = document.getElementById("payload")
     let received = document.getElementById("received")
-    clearBrokerBtn.addEventListener("clear", function() {
+    clearBrokerBtn.addEventListener("click", function() {
         received.innerHTML = ""
         output.innerHTML = ""
     })
