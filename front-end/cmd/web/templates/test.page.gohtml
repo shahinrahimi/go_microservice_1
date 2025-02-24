@@ -9,6 +9,7 @@
                 <a id="brokerBtn" class="btn btn-outline-secondary" href="javascript:void(0)" >Test Broker</a>
                 <a id="authBrokerBtn" class="btn btn-outline-secondary" href="javascript:void(0)" >Test Auth</a>
 
+                <a id="clearBrokerBtn" class="btn btn-outline-secondary" href="javascript:void(0)" >Clear</a>
                 <div id="output" class="mt-5" style="outline: 1px solid silver; padding: 2em;">
                     <span class="text-muted">Output shows here...</span>
                 </div>
@@ -35,10 +36,18 @@ jj
     <script>
     let brokerBtn = document.getElementById("brokerBtn")
     let authBrokerBtn = document.getElementById("authBrokerBtn")
+
+    let clearBrokerBtn = document.getElementById("clearBrokerBtn")
     let output = document.getElementById("output")
+    
     let sent = document.getElementById("payload")
     let received = document.getElementById("received")
+    clearBrokerBtn.addEventListener("clear", function() {
+        received.innerHTML = ""
+        output.innerHTML = ""
+    })
     authBrokerBtn.addEventListener("click", function() {
+
         const payload = {
             action: "auth",
             auth: {
