@@ -8,6 +8,11 @@ import (
 	"net/http"
 )
 
+const (
+	authServiceURL = "http://auth-service:3002/auth"
+	logServiceURL  = "http://logger-service:3003/log"
+)
+
 type RequestPayload struct {
 	Action string      `json:"action"`
 	Auth   AuthPayload `json:"auth,omitempty"`
@@ -61,8 +66,6 @@ func (app *Config) logItem(w http.ResponseWriter, entry LogPayload) {
 		return
 	}
 
-	logServiceURL := "http://logger-service:3002/log"
-
 	request, err := http.NewRequest(http.MethodPost, logServiceURL, bytes.NewBuffer(jsonData))
 	if err != nil {
 		app.errorJSON(w, err)
@@ -101,7 +104,7 @@ func (app *Config) authenticate(w http.ResponseWriter, ap AuthPayload) {
 	// create some json we will send to the auth microservice
 	jsonData, _ := json.MarshalIndent(ap, "", "\t")
 	// call the service
-	request, err := http.NewRequest("POST", "http://auth-service:300auth", bytes.NewBuffer(jsonData))
+	request, err := http.NewRequest(http.MethodPost, authServiceURL, bytes.NewBuffer(jsonData))
 	if err != nil {
 		app.errorJSON(w, err)
 		return
