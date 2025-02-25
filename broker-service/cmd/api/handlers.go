@@ -8,14 +8,20 @@ import (
 	"net/http"
 )
 
+type RequestPayload struct {
+	Action string      `json:"action"`
+	Auth   AuthPayload `json:"auth,omitempty"`
+	Log    LogPayload  `json:"log,omitempty"`
+}
+
 type AuthPayload struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-type RequestPayload struct {
-	Action string      `json:"action"`
-	Auth   AuthPayload `json:"auth"`
+type LogPayload struct {
+	Name     string `json:"name"`
+	Password string `json:"data"`
 }
 
 func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
@@ -41,16 +47,61 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	switch requestPayload.Action {
 	case "auth":
 		app.authenticate(w, requestPayload.Auth)
+	case "log":
+		app.logItem(w, requestPayload.Log)
 	default:
 		app.errorJSON(w, errors.New("unknown action"))
 	}
+}
+
+func (app *Config) logItem(w http.ResponseWriter, entry LogPayload) {
+	jsonData, err := json.MarshalIndent(entry, "", "\t")
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	logServiceURL := "http://logger-service:3002/log"
+
+	request, err := http.NewRequest(http.MethodPost, logServiceURL, bytes.NewBuffer(jsonData))
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	request.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+
+	response, err := client.Do(request)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusAccepted {
+		app.errorJSON(w, errors.New("error calling logger service"))
+		return
+	}
+
+	var payload jsonResponse
+	payload.Error = false
+	payload.Message = "logged"
+
+	err = app.writeJSON(w, http.StatusAccepted, payload)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
 }
 
 func (app *Config) authenticate(w http.ResponseWriter, ap AuthPayload) {
 	// create some json we will send to the auth microservice
 	jsonData, _ := json.MarshalIndent(ap, "", "\t")
 	// call the service
-	request, err := http.NewRequest("POST", "http://auth-service:3002/auth", bytes.NewBuffer(jsonData))
+	request, err := http.NewRequest("POST", "http://auth-service:300auth", bytes.NewBuffer(jsonData))
 	if err != nil {
 		app.errorJSON(w, err)
 		return
