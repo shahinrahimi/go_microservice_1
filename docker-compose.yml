@@ -19,7 +19,15 @@ services:
     deploy:
       mode: replicated
       replicas: 1
-  
+  logger-service:
+   image: logger-api
+   build: ./logger-service
+   restart: always
+   ports:
+     - "3003:3003"
+   deploy:
+     mode: replicated
+     replicas: 1
   auth-service:
     image: auth-api
     build: ./auth-service 
@@ -46,3 +54,17 @@ services:
     volumes:
       - ./db-data/postgres/:/var/lib/postgresql/data/
   
+  mongo:
+    image: docker.arvancloud.ir/mongo:latest
+    ports: 
+      - "27017:27017"
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      MONGO_INITDB_DATABASE: logs
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - ./db-data/mongo/:/data/db
