@@ -10,6 +10,22 @@ services:
         mode: replicated
         replicas: 1
 
+  mailer-service:
+    image: mailer-api
+    build: ./mailer-service
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      MAIL_DOMAIN: localhost
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      MAIL_ENCRYPTION: none
+      MAIL_USERNAME: ""
+      MAIL_PASSWORD: ""
+      MAIL_FROM_NAME: "John Smith"
+      MAIL_FROM_ADDRESS;: "john.smith@example.com"
   broker-service:
     image: broker-api
     build: ./broker-service 
