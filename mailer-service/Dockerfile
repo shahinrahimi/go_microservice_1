@@ -12,5 +12,5 @@ FROM docker.arvancloud.ir/alpine:latest
 WORKDIR /root
 
 COPY --from=builder /bin/mailerApp .
-
+COPY --from=builder /app/templates ./templates
 CMD ["/root/mailerApp"]
