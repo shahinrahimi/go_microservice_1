@@ -14,6 +14,8 @@ services:
     image: mailer-api
     build: ./mailer-service
     restart: always
+    ports:
+      - "3004:3004"
     deploy:
       mode: replicated
       replicas: 1
