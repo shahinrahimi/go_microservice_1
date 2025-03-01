@@ -11,6 +11,7 @@ type Emitter struct {
 }
 
 func (e *Emitter) setup() error {
+	log.Println("setting up event emitter setup")
 	channel, err := e.conn.Channel()
 	if err != nil {
 		return err
@@ -20,12 +21,13 @@ func (e *Emitter) setup() error {
 }
 
 func (e *Emitter) Push(event string, severity string) error {
+	log.Printf("Grabbing channel")
 	channel, err := e.conn.Channel()
 	if err != nil {
 		return err
 	}
 	defer channel.Close()
-	log.Println("Pushing to channel")
+	log.Println("Publishing message")
 
 	err = channel.Publish(
 		"logs_topic",
@@ -44,10 +46,11 @@ func (e *Emitter) Push(event string, severity string) error {
 }
 
 func NewEventEmitter(conn *amqp.Connection) (Emitter, error) {
+	log.Printf("creating event emitter with conn: %v\n", conn)
 	emitter := Emitter{
 		conn: conn,
 	}
-
+	log.Printf("setting up event emitter\n")
 	err := emitter.setup()
 	if err != nil {
 		return Emitter{}, err

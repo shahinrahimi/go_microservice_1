@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -63,8 +64,9 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	case "auth":
 		app.authenticate(w, requestPayload.Auth)
 	case "log":
-		//app.logItem(w, requestPayload.Log)
 		app.logEventViaRabbitMQ(w, requestPayload.Log)
+	case "raw-log":
+		app.logItem(w, requestPayload.Log)
 	case "mail":
 		app.sendMail(w, requestPayload.Mail)
 	default:
@@ -204,6 +206,7 @@ func (app *Config) sendMail(w http.ResponseWriter, msg MailPayload) {
 }
 
 func (app *Config) logEventViaRabbitMQ(w http.ResponseWriter, l LogPayload) {
+	log.Println("logging via RabbitMQ")
 	err := app.pushToQueue(l.Name, l.Data)
 	if err != nil {
 		app.errorJSON(w, err)
@@ -213,11 +216,14 @@ func (app *Config) logEventViaRabbitMQ(w http.ResponseWriter, l LogPayload) {
 	var payload jsonResponse
 	payload.Error = false
 	payload.Message = "logged via RabbitMQ"
+	log.Printf("logged via RabbitMQ: %v\n", l)
 
 	app.writeJSON(w, http.StatusAccepted, payload)
 }
 
 func (app *Config) pushToQueue(name, msg string) error {
+	log.Printf("pushing to queue: %s\n", name)
+	log.Printf("creating event emitter with conn: %v\n", app.Rabbit)
 	emitter, err := event.NewEventEmitter(app.Rabbit)
 	if err != nil {
 		return err
@@ -229,7 +235,7 @@ func (app *Config) pushToQueue(name, msg string) error {
 	}
 
 	j, _ := json.MarshalIndent(&payload, "", "\t")
-
+	log.Printf("emitting event [emitter.Push]: %s\n", string(j))
 	err = emitter.Push(string(j), "log.INFO")
 	if err != nil {
 		return err

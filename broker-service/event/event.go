@@ -1,10 +1,13 @@
 package event
 
 import (
+	"log"
+
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 func declareExchange(ch *amqp.Channel) error {
+	log.Printf("declaring exchange")
 	return ch.ExchangeDeclare(
 		"logs_topic", // name
 		"topic",      // type
@@ -17,6 +20,7 @@ func declareExchange(ch *amqp.Channel) error {
 }
 
 func declareRandomQueue(ch *amqp.Channel) (amqp.Queue, error) {
+	log.Printf("declaring random queue")
 	return ch.QueueDeclare(
 		"",    // name
 		false, // durable
