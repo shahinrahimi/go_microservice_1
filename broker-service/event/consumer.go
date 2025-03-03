@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -22,9 +23,11 @@ type Consumer struct {
 }
 
 func NewConsumer(conn *amqp.Connection) (Consumer, error) {
+	log.Printf("creating consumer with conn: %v\n", conn)
 	consumer := Consumer{
 		conn: conn,
 	}
+	log.Printf("setting up consumer\n")
 	err := consumer.setup()
 	if err != nil {
 		return Consumer{}, err
@@ -33,6 +36,7 @@ func NewConsumer(conn *amqp.Connection) (Consumer, error) {
 }
 
 func (c *Consumer) setup() error {
+	log.Printf("setting up consumer setup")
 	channel, err := c.conn.Channel()
 	if err != nil {
 		return err
@@ -47,6 +51,7 @@ type Payload struct {
 }
 
 func (c *Consumer) Listen(topics []string) error {
+	log.Printf("listening to topics: %v\n", topics)
 	ch, err := c.conn.Channel()
 	if err != nil {
 		return err
@@ -58,6 +63,7 @@ func (c *Consumer) Listen(topics []string) error {
 		return err
 	}
 
+	log.Printf("binding queue [%s] to exchange [logs_topic]\n", q.Name)
 	for _, s := range topics {
 		err = ch.QueueBind(
 			q.Name,
@@ -71,11 +77,13 @@ func (c *Consumer) Listen(topics []string) error {
 		}
 	}
 
+	log.Printf("consume messages from queue [%s]\n", q.Name)
 	messages, err := ch.Consume(q.Name, "", true, false, false, false, nil)
 	if err != nil {
 		return err
 	}
 
+	log.Printf("forever read messages from queue [%s]\n", q.Name)
 	forever := make(chan bool)
 	go func() {
 		for d := range messages {
@@ -86,7 +94,7 @@ func (c *Consumer) Listen(topics []string) error {
 		}
 	}()
 
-	fmt.Printf("waiting for message [Exchange, Queue] [logs_topic, %s]\n", q.Name)
+	log.Printf("waiting for message [Exchange, Queue] [logs_topic, %s]\n", q.Name)
 
 	<-forever
 

@@ -28,6 +28,7 @@ services:
       MAIL_PASSWORD: ""
       MAIL_FROM_NAME: "John Smith"
       MAIL_FROM_ADDRESS;: "john.smith@example.com"
+      
   broker-service:
     image: broker-api
     build: ./broker-service 
@@ -37,6 +38,7 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      
   logger-service:
    image: logger-api
    build: ./logger-service
@@ -46,6 +48,7 @@ services:
    deploy:
      mode: replicated
      replicas: 1
+
   auth-service:
     image: auth-api
     build: ./auth-service 
@@ -95,16 +98,17 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+
   rabbitmq:
-    image: docker.arvancloud.ir/rabbitmq:3.9-alpine
+    image: docker.arvancloud.ir/rabbitmq:3.9-management-alpine
     ports:
+      - "15672:15672"
       - "5672:5672"
     deploy:
       mode: replicated
       replicas: 1
     volumes:
       - ./db-data/rabbitmq/:/var/lib/rabbitmq
-
 
   listener-service:
     image: listener-api
